@@ -44,3 +44,10 @@ func GetLikeSqlParamStrInTwoPercent(likeStr string) (sqlParam string) {
 	sqlParam = fmt.Sprintf("'%%%s%%'", likeStr)
 	return
 }
+
+// GetSqlParamStrInTwoSingleQuote 将 srcStr: "1d2fg3" 转化为 sqlParam: "'1d2fg3'", srcStr == "" => sqlParam: "''", 返回值 sqlParam 可以直接用于sql语句中, 不会被sql注入
+func GetSqlParamStrInTwoSingleQuote(srcStr string) (sqlParam string) {
+
+	sqlParam = fmt.Sprintf("'%s'", srcStr)
+	return
+}

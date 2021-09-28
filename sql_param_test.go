@@ -1,6 +1,8 @@
 package utils
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestGetSqlParamFromStrings(t *testing.T) {
 	type args struct {
@@ -166,6 +168,53 @@ func TestGetLikeSqlParamStrInTwoPercent(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotSqlParam := GetLikeSqlParamStrInTwoPercent(tt.args.likeStr); gotSqlParam != tt.wantSqlParam {
 				t.Errorf("GetLikeSqlParamStrInTwoPercent() = %v, want %v", gotSqlParam, tt.wantSqlParam)
+			}
+		})
+	}
+}
+
+func TestGetSqlParamStrInTwoSingleQuote(t *testing.T) {
+	type args struct {
+		srcStr string
+	}
+	tests := []struct {
+		name         string
+		args         args
+		wantSqlParam string
+	}{
+		{
+			name: "empty srcStr",
+			args: args{
+				srcStr: "",
+			},
+			wantSqlParam: "''",
+		},
+		{
+			name: "souls",
+			args: args{
+				srcStr: "souls",
+			},
+			wantSqlParam: "'souls'",
+		},
+		{
+			name: "1fca21",
+			args: args{
+				srcStr: "1fca21",
+			},
+			wantSqlParam: "'1fca21'",
+		},
+		{
+			name: "2dca21",
+			args: args{
+				srcStr: "2dca21",
+			},
+			wantSqlParam: "'2dca21'",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotSqlParam := GetSqlParamStrInTwoSingleQuote(tt.args.srcStr); gotSqlParam != tt.wantSqlParam {
+				t.Errorf("GetSqlParamStrInTwoSingleQuote() = %v, want %v", gotSqlParam, tt.wantSqlParam)
 			}
 		})
 	}
