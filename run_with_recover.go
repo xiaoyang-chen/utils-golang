@@ -14,7 +14,7 @@ func RunWithRecover(runFunc func() (err error)) (runWithRecover func() (err erro
 		defer func() {
 			if panicErr, ok := recover().(error); ok {
 				err = fmt.Errorf(strRunWithRecoverPanicFmt,
-					panicErr.Error(), string(debug.Stack()),
+					panicErr.Error(), Bytes2Str(debug.Stack()),
 				)
 			}
 		}()

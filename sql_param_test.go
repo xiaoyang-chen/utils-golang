@@ -51,7 +51,7 @@ func TestGetSqlParamFromStrings(t *testing.T) {
 		{
 			name: "len(strings) == 4",
 			args: args{
-				strings: []string{"123saf", "12312af12", "eda213", "eda13zc"},
+				strings: []string{"123saf", "12312af12", "eda213", "eda13z'c"},
 			},
 			wantSqlParam: "'123saf', '12312af12', 'eda213', 'eda13zc'",
 		},
@@ -143,6 +143,13 @@ func TestGetLikeSqlParamStrInTwoPercent(t *testing.T) {
 			wantSqlParam: "",
 		},
 		{
+			name: "2dca2''1",
+			args: args{
+				likeStr: "2dca2''1",
+			},
+			wantSqlParam: "",
+		},
+		{
 			name: "souls",
 			args: args{
 				likeStr: "souls",
@@ -190,6 +197,13 @@ func TestGetSqlParamStrInTwoSingleQuote(t *testing.T) {
 			wantSqlParam: "''",
 		},
 		{
+			name: "2dca2''1",
+			args: args{
+				srcStr: "2dca2''1",
+			},
+			wantSqlParam: "",
+		},
+		{
 			name: "souls",
 			args: args{
 				srcStr: "souls",
@@ -215,6 +229,60 @@ func TestGetSqlParamStrInTwoSingleQuote(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotSqlParam := GetSqlParamStrInTwoSingleQuote(tt.args.srcStr); gotSqlParam != tt.wantSqlParam {
 				t.Errorf("GetSqlParamStrInTwoSingleQuote() = %v, want %v", gotSqlParam, tt.wantSqlParam)
+			}
+		})
+	}
+}
+
+func TestGetMulQuestionMarkDividedByComma(t *testing.T) {
+	type args struct {
+		length int
+	}
+	tests := []struct {
+		name         string
+		args         args
+		wantSqlParam string
+	}{
+		{
+			name: "length < 0",
+			args: args{
+				length: -1,
+			},
+			wantSqlParam: "",
+		},
+		{
+			name: "length == 0",
+			args: args{
+				length: 0,
+			},
+			wantSqlParam: "",
+		},
+		{
+			name: "length == 1",
+			args: args{
+				length: 1,
+			},
+			wantSqlParam: "?",
+		},
+		{
+			name: "length == 2",
+			args: args{
+				length: 2,
+			},
+			wantSqlParam: "?,?",
+		},
+		{
+			name: "length == 3",
+			args: args{
+				length: 3,
+			},
+			wantSqlParam: "?,?,?",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotSqlParam := GetMulQuestionMarkDividedByComma(tt.args.length); gotSqlParam != tt.wantSqlParam {
+				t.Errorf("SqlParam() = %v, want %v", gotSqlParam, tt.wantSqlParam)
 			}
 		})
 	}
