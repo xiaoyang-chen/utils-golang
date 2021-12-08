@@ -29,8 +29,8 @@ func CheckCNPhonesFormat(phones string) (err error) {
 	}
 
 	for i := 0; i < lenPhones; i++ {
-		if i%(cnPhoneLengthAddOne) == cnPhoneLength {
-			if phones[i] != ',' {
+		if phones[i] == ',' {
+			if i%(cnPhoneLengthAddOne) != cnPhoneLength {
 				err = ErrCNPhonesStringFormatWrong
 				return
 			} else {
