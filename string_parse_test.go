@@ -62,3 +62,57 @@ func TestIsOnlyHasDigitalAndComma(t *testing.T) {
 		})
 	}
 }
+
+func TestCheckCNPhonesFormat(t *testing.T) {
+	type args struct {
+		phones string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "12345678901",
+			args: args{
+				phones: "12345678901",
+			},
+			wantErr: false,
+		},
+		{
+			name: "12345678901,12345678901",
+			args: args{
+				phones: "12345678901,12345678901",
+			},
+			wantErr: false,
+		},
+		{
+			name: "12345678901, 12345678901",
+			args: args{
+				phones: "12345678901, 12345678901",
+			},
+			wantErr: true,
+		},
+		{
+			name: ",12345678901, 12345678901",
+			args: args{
+				phones: ",12345678901, 12345678901",
+			},
+			wantErr: true,
+		},
+		{
+			name: "12345678901,1234567890",
+			args: args{
+				phones: "12345678901,1234567890",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := CheckCNPhonesFormat(tt.args.phones); (err != nil) != tt.wantErr {
+				t.Errorf("CheckCNPhonesFormat() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
