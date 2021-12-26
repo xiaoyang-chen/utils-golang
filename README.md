@@ -1,2 +1,3 @@
 # utils-golang
-reduce times of writing same function
+
+## reduce times of writing same function
