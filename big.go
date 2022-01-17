@@ -8,8 +8,7 @@ import (
 
 const errFmtBigIntSetString10 = "(*big.Int).SetString(%s, 10) fail"
 
-var bigIntZero = BigIntZero() // bigIntZero big int from 0, can not change
-var emptyBytes = []byte{}     // emptyBytes as empty byte slice, can not change
+var emptyBytes = []byte{} // emptyBytes as empty byte slice, can not change
 
 func BigIntZero() *big.Int { return big.NewInt(0) }
 
@@ -110,9 +109,12 @@ func BigIntNeg(x *big.Int) (negX *big.Int) { return BigIntZero().Neg(x) }
 // BigIntAbs returns |x|, if x == nil, will panic
 func BigIntAbs(x *big.Int) (absX *big.Int) {
 
-	if BigIntGte(x, bigIntZero) {
+	switch x.Sign() {
+	case 1:
 		absX = BigIntCopy(x)
-	} else {
+	case 0:
+		absX = BigIntZero()
+	default:
 		absX = BigIntNeg(x)
 	}
 	return
