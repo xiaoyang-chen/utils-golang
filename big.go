@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
 	"math/big"
 )
@@ -21,7 +20,7 @@ func NewBigIntFromString(str string) (b *big.Int, err error) {
 
 	var ok bool
 	if b, ok = BigIntZero().SetString(str, 10); !ok {
-		err = errors.New(fmt.Sprintf(errFmtBigIntSetString10, str))
+		err = fmt.Errorf(errFmtBigIntSetString10, str)
 	}
 	return
 }
@@ -81,9 +80,9 @@ func BigIntIsZero(b *big.Int) (isZero bool) { return b == nil || b.Sign() == 0 }
 
 // BigIntCmp compares a and b and returns:
 //
-//   -1 if a <  b
-//    0 if a == b
-//   +1 if a >  b
+//	-1 if a <  b
+//	 0 if a == b
+//	+1 if a >  b
 //
 // if a == nil || b == nil, will panic
 func BigIntCmp(a, b *big.Int) int { return a.Cmp(b) }
