@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"testing"
 	"time"
 )
@@ -64,13 +65,7 @@ func TestTickerRun(t *testing.T) {
 			args: args{
 				spec:  "0/2 * * * * *",
 				start: time.Now(),
-				run: func(errTickerRun error, now time.Time) {
-					if errTickerRun != nil {
-						t.Logf("errTickerRun: %v", errTickerRun)
-						return
-					}
-					t.Log(now)
-				},
+				run:   func(errTickerRun error, now time.Time) { t.Log("test, errTickerRun", errTickerRun, "now", now) },
 			},
 		},
 	}
@@ -80,5 +75,49 @@ func TestTickerRun(t *testing.T) {
 			go TickerRun(tt.args.spec, tt.args.start, tt.args.run)
 		})
 	}
+	<-time.After(10 * time.Second)
+}
+
+func TestTickerRunWithContext(t *testing.T) {
+	type args struct {
+		ctx   context.Context
+		spec  string
+		start time.Time
+		run   func(errTickerRun error, now time.Time)
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "test",
+			args: args{
+				ctx:   context.Background(),
+				spec:  "0/2 * * * * *",
+				start: time.Now(),
+				run:   func(errTickerRun error, now time.Time) { t.Log("test, errTickerRun", errTickerRun, "now", now) },
+			},
+		},
+		{
+			name: "test-1",
+			args: args{
+				spec:  "0/1 * * * * *",
+				start: time.Now(),
+				run:   func(errTickerRun error, now time.Time) { t.Log("test-1, errTickerRun", errTickerRun, "now", now) },
+			},
+		},
+	}
+	// add ctx into args
+	var cancel1 context.CancelFunc
+	tests[1].args.ctx, cancel1 = context.WithTimeout(context.Background(), 6*time.Second)
+	defer cancel1()
+	// run test
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// TickerRunWithContext(tt.args.ctx, tt.args.spec, tt.args.start, tt.args.run)
+			go TickerRunWithContext(tt.args.ctx, tt.args.spec, tt.args.start, tt.args.run)
+		})
+	}
+	// wait for 10s for test ticker
 	<-time.After(10 * time.Second)
 }

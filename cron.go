@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"math"
 	"strconv"
 	"strings"
@@ -92,6 +93,41 @@ func NextTime(spec string, start time.Time) (next time.Time, err error) {
 	}
 	next, err = nextTime(second, minute, hour, dom, month, dow, start)
 	return
+}
+
+// TickerRunWithContext will block current goroutine, usage: go TickerRunWithContext(...)
+func TickerRunWithContext(ctx context.Context, spec string, start time.Time, run func(errTickerRun error, now time.Time)) {
+
+	if ctx == nil {
+		run(errors.New("func TickerRunWithContext param ctx is nil"), time.Now())
+		return
+	}
+	var second, minute, hour, dom, month, dow uint64 // dom day of month, dow day of week
+	var err error
+	if second, minute, hour, dom, month, dow, err = parseSpec(spec); err != nil {
+		run(err, time.Now())
+		return
+	}
+	var next, now time.Time
+	var chanRun = make(chan time.Time, 1)
+	for {
+		if next, err = nextTime(second, minute, hour, dom, month, dow, start); err != nil {
+			run(err, time.Now())
+			return
+		}
+		go func(next, start time.Time) {
+			time.Sleep(next.Sub(start))
+			chanRun <- next
+		}(next, start)
+		start = next
+		select {
+		case <-ctx.Done():
+			run(ctx.Err(), time.Now())
+			return
+		case now = <-chanRun:
+			go run(nil, now)
+		}
+	}
 }
 
 func TickerRun(spec string, start time.Time, run func(errTickerRun error, now time.Time)) {
