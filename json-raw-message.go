@@ -7,6 +7,7 @@ import (
 )
 
 const (
+	// _strTwoDoubleQuotes                         = `""`
 	_strNull                                    = "null"
 	_strJsonRawMessageUnmarshalJSONOnNilPointer = "utils.JsonRawMessage: UnmarshalJSON on nil pointer"
 )
@@ -23,7 +24,9 @@ var _ json.Unmarshaler = (*JsonRawMessage)(nil)
 func (m JsonRawMessage) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return []byte(_strNull), nil
-	}
+	} /*else if len(m) == 0 { // if get make([]byte, 0), should we return `""`?, []byte in json marshal return `""`, but this is raw message, so do not return, just raw return
+		return []byte(_strTwoDoubleQuotes), nil
+	}*/
 	return m, nil
 }
 
