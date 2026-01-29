@@ -67,3 +67,20 @@ func Float64ToKMGT(float float64) (kmgt string) {
 	kmgt = fmt.Sprintf(format, float)
 	return
 }
+
+// ConvertPositiveIntegerToStringBase10, if in < 0, will return "-1"
+func ConvertPositiveIntegerToStringBase10(in int64) (str string) {
+
+	if in < 0 {
+		return "-1"
+	}
+	var bs = make([]byte, 19) // len("9223372036854775807"), math.MaxInt64
+	var i = 18
+	for ; in >= 10; i-- {
+		bs[i] = '0' + byte(in%10)
+		in /= 10
+	}
+	bs[i] = '0' + byte(in)
+	str = Bytes2Str(bs[i:])
+	return
+}

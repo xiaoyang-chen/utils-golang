@@ -1,6 +1,9 @@
 package utils
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
 
 func TestNumToFloat64(t *testing.T) {
 	type args struct {
@@ -163,6 +166,88 @@ func TestFloat64ToKMGT(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Float64ToKMGT(tt.args.float); got != tt.want {
 				t.Errorf("Float64ToKMGT() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_ConvertPositiveIntegerToStringBase10(t *testing.T) {
+	type args struct {
+		in int64
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantStr string
+	}{
+		{
+			name: "math.MaxInt64",
+			args: args{
+				in: math.MaxInt64,
+			},
+			wantStr: "9223372036854775807",
+		},
+		{
+			name: "-111",
+			args: args{
+				in: -111,
+			},
+			wantStr: "-1",
+		},
+		{
+			name: "1234567",
+			args: args{
+				in: 1234567,
+			},
+			wantStr: "1234567",
+		},
+		{
+			name: "0",
+			args: args{
+				in: 0,
+			},
+			wantStr: "0",
+		},
+		{
+			name: "1",
+			args: args{
+				in: 1,
+			},
+			wantStr: "1",
+		},
+		{
+			name: "2",
+			args: args{
+				in: 2,
+			},
+			wantStr: "2",
+		},
+		{
+			name: "3",
+			args: args{
+				in: 3,
+			},
+			wantStr: "3",
+		},
+		{
+			name: "4",
+			args: args{
+				in: 4,
+			},
+			wantStr: "4",
+		},
+		{
+			name: "5",
+			args: args{
+				in: 5,
+			},
+			wantStr: "5",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotStr := ConvertPositiveIntegerToStringBase10(tt.args.in); gotStr != tt.wantStr {
+				t.Errorf("ConvertPositiveIntegerToStringBase10() = %v, want %v", gotStr, tt.wantStr)
 			}
 		})
 	}
