@@ -12,8 +12,9 @@ func TestWithDisableTimeout(t *testing.T) {
 
 	var ctxParent = context.WithValue(context.Background(), "test1", "test1")
 	ctxParent = context.WithValue(ctxParent, "test2", "test2")
+	ctxParent = context.WithValue(ctxParent, "test3", "test3")
 	var wg sync.WaitGroup
-	wg.Add(2)
+	wg.Add(3)
 	// test 1
 	go func() {
 		defer wg.Done()
@@ -58,6 +59,28 @@ func TestWithDisableTimeout(t *testing.T) {
 			fmt.Println("test 2, Finished normally (timeout was disabled)")
 		case <-ctx.Done():
 			fmt.Println("test 2, Context ended:", ctx.Err())
+		}
+	}()
+	// test 3
+	go func() {
+		defer wg.Done()
+		disable := make(chan struct{})
+		ctx, cancel := WithDisableTimeout(ctxParent, 3*time.Second, disable)
+		defer cancel()
+		go func() { // Simulate work
+			time.Sleep(2 * time.Second)
+			close(disable)
+			cancel()
+			fmt.Println("test 3, Work 1st stage almost done... but we cancel it because some spec reasons")
+			fmt.Println(ctx.Deadline())
+			fmt.Println(ctx.Value("test3"))
+		}()
+		// wait
+		select {
+		case <-time.After(5 * time.Second):
+			fmt.Println("test 3, Finished normally (timeout was disabled)")
+		case <-ctx.Done():
+			fmt.Println("test 3, Context ended:", ctx.Err())
 		}
 	}()
 	wg.Wait()
